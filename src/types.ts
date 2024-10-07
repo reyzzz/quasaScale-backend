@@ -1,11 +1,13 @@
 declare module 'bun' {
   interface Env {
-    BEARER_TOKEN: string
+    HEADSCALE_TOKEN: string
     HEADSCALE_CONFIG_YAML: string
     HEADSCALE_SQLITE_PATH: string
     QUASCALE_URL: string
     HEADSCALE_API_URL: string
     HEADSCALE_SERVICE: string
+    DOCKER: boolean
+    CONTAINER_NAME: string
   }
 }
 
@@ -115,4 +117,53 @@ export interface DNSSettings {
   is_magic_dns: boolean
   name_servers: string[]
   search_domains: string[]
+}
+
+type WithPrefix<T extends string> = `${T}${string}`
+
+export interface Groups {
+  [key: WithPrefix<'group:'>]: string[]
+}
+
+export interface TagOwners {
+  [key: WithPrefix<'tag:'>]: string[]
+}
+
+export interface Hosts {
+  [key: string]: string
+}
+
+export interface Host {
+  [
+    key:
+      | WithPrefix<'group'>
+      | WithPrefix<'tag'>
+      | WithPrefix<'autogroup:'>
+      | string
+  ]: string
+}
+export interface ACL {
+  action: 'accept'
+  proto:
+    | 'igmp'
+    | 'ipv4'
+    | 'ip-in-ip'
+    | 'tcp'
+    | 'egp'
+    | 'igp'
+    | 'udp'
+    | 'gre'
+    | 'esp'
+    | 'ah'
+    | 'sctp'
+    | (string & {})
+  src: Host[]
+  dst: Host[]
+}
+
+export interface ACLConfig {
+  groups: Groups
+  tagOwners: TagOwners
+  Hosts: Hosts
+  acls: ACL[]
 }

@@ -2,10 +2,9 @@ import { Hono } from 'hono'
 import { bearerAuth } from 'hono/bearer-auth'
 import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
-import systemctl from './systemctl'
-import headscale from './headscale'
+import { Headscale } from './headscale'
 const proxy_url = Bun.env.HEADSCALE_API_URL
-const HEADSCALE_SERVICE = Bun.env.HEADSCALE_SERVICE
+const headscale = Headscale.Instance()
 const app = new Hono()
 app.use(
   '/*',
@@ -20,7 +19,7 @@ app.use(
 app.use(
   '/api/*',
   bearerAuth({
-    token: Bun.env.BEARER_TOKEN,
+    token: Bun.env.HEADSCALE_TOKEN,
     invalidTokenMessage: 'Invalid Token',
   })
 )
@@ -47,8 +46,8 @@ app.delete('/api/domain/:index', async (c) => {
 })
 
 app.get('/api/domains', async (c) => {
-  const data = await headscale.readConfig()
-  return c.json({ domains: data.dns.extra_records }, 200)
+  const extra_records = await headscale.getDomains()
+  return c.json({ domains: extra_records }, 200)
 })
 
 app.patch('/api/ip/:nodeId', async (c) => {
@@ -78,10 +77,10 @@ app.get('/api/version', async (c) => {
 
 app.post('/api/restart', async (c) => {
   try {
-    await systemctl.restart(HEADSCALE_SERVICE)
-    return c.json({ message: `${HEADSCALE_SERVICE} restarted` }, 200)
+    const message = await headscale.restart()
+    return c.json({ message }, 200)
   } catch (err) {
-    console.error(err)
+    return c.json({ message: err }, 500)
   }
 })
 
@@ -116,8 +115,31 @@ app.patch('/api/magic-dns', async (c) => {
 // })
 
 app.get('/api/dns-settings', async (c) => {
-  const dns_settings = await headscale.getDNSSettings()
-  return c.json({ dns_settings: dns_settings })
+  try {
+    const dns_settings = await headscale.getDNSSettings()
+    return c.json({ dns_settings: dns_settings })
+  } catch (err) {
+    return c.json({ message: err }, 500)
+  }
+})
+
+app.get('/api/acls', async (c) => {
+  try {
+    const acls = await headscale.getACLs()
+    return c.json({ acls })
+  } catch (err) {
+    return c.json({ message: err }, 500)
+  }
+})
+
+app.patch('/api/acls', async (c) => {
+  try {
+    const { data } = await c.req.json()
+    await headscale.updateACLs(data)
+    return c.json({ message: 'ACLs updated successfully' }, 200)
+  } catch (ex) {
+    return c.json({ message: ex }, 500)
+  }
 })
 
 app.all('/api/*', async (c) => {
