@@ -6,7 +6,7 @@ declare module 'bun' {
     QUASCALE_URL: string
     HEADSCALE_API_URL: string
     HEADSCALE_SERVICE: string
-    DOCKER: boolean
+    DOCKER: string
     CONTAINER_NAME: string
   }
 }
@@ -166,4 +166,36 @@ export interface ACLConfig {
   tagOwners: TagOwners
   Hosts: Hosts
   acls: ACL[]
+}
+
+export function isGroups(obj: any): obj is Groups {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    Object.keys(obj).every((key) => key.startsWith('group:') && key.length > 6)
+  )
+}
+
+export function isTagOwners(obj: any): obj is TagOwners {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    Object.keys(obj).every((key) => key.startsWith('tag:') && key.length > 4)
+  )
+}
+
+export function isACL(obj: any): obj is ACL {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'action' in obj &&
+    'src' in obj &&
+    'dst' in obj &&
+    obj.src.length > 0 &&
+    obj.dst.length > 0
+  )
+}
+
+export function isHosts(obj: any): obj is Hosts {
+  return !isGroups(obj) && !isTagOwners(obj) && !isACL(obj)
 }

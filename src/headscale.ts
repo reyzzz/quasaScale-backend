@@ -7,10 +7,14 @@ import {
   TagOwners,
   Hosts,
   ACL,
+  isACL,
+  isGroups,
+  isTagOwners,
+  isHosts,
 } from './types'
 import { load, dump } from 'js-yaml'
 import { Database } from 'bun:sqlite'
-import { $ } from 'bun'
+import { $, ShellError } from 'bun'
 import { parse, stringify } from 'hjson'
 import systemctl from './systemctl'
 
@@ -27,7 +31,7 @@ export class Headscale {
    */
   private constructor() {
     if (Bun.env.DOCKER == undefined) throw new Error('DOCKER is not set')
-    if (Bun.env.DOCKER == false) {
+    if (Bun.env.DOCKER === 'false') {
       if (
         Bun.env.HEADSCALE_SERVICE == undefined ||
         Bun.env.HEADSCALE_SERVICE == ''
@@ -44,7 +48,7 @@ export class Headscale {
       throw new Error('HEADSCALE_CONFIG_YAML is not set')
 
     this.HEADSCALE_SERVICE = Bun.env.HEADSCALE_SERVICE
-    this.IS_DOCKER = Bun.env.DOCKER
+    this.IS_DOCKER = Bun.env.DOCKER === 'false' ? false : true
     this.CONTAINER_NAME = Bun.env.CONTAINER_NAME
     this.CONFIG_PATH = Bun.env.HEADSCALE_CONFIG_YAML
   }
@@ -183,10 +187,13 @@ export class Headscale {
 
   async updateACLs(data: Partial<ACLConfig>) {
     const acls = await this.readAcls()
-    if (Array.isArray(data) && 'acls' in data) acls.acls = data.acls as ACL[]
-    else if ('groups' in data) acls.groups = data.groups as Groups
-    else if ('tagOwners' in data) acls.tagOwners = data.tagOwners as TagOwners
-    else if ('Hosts' in data) acls.Hosts = data.Hosts as Hosts
+    if ('acls' in data && Array.isArray(data.acls) && isACL(data.acls[0]))
+      acls.acls = data.acls
+    else if ('groups' in data && isGroups(data.groups))
+      acls.groups = data.groups
+    else if ('tagOwners' in data && isTagOwners(data.tagOwners))
+      acls.tagOwners = data.tagOwners
+    else if ('Hosts' in data && isHosts(data.Hosts)) acls.Hosts = data.Hosts
     await this.applyACLs()
   }
 
@@ -199,12 +206,25 @@ export class Headscale {
     return `${this.HEADSCALE_SERVICE} not running`
   }
   async restart() {
-    const config = await this.readConfig()
-    await Bun.write(this.CONFIG_PATH, dump(config))
-    if (this.IS_DOCKER) {
-      await $`docker exec ${this.CONTAINER_NAME} service ${this.HEADSCALE_SERVICE} restart`
-    } else await systemctl.restart(this.HEADSCALE_SERVICE)
-    return `${this.HEADSCALE_SERVICE} restarted`
+    try {
+      const config = await this.readConfig()
+      await Bun.write(this.CONFIG_PATH, dump(config))
+      let resp: string
+      if (this.IS_DOCKER) {
+        resp = (
+          await $`docker exec ${this.CONTAINER_NAME} service ${this.HEADSCALE_SERVICE} restart`
+        ).text()
+        return resp
+      } else {
+        resp = await systemctl.restart(this.HEADSCALE_SERVICE).text()
+      }
+      if (resp === '') return `${this.HEADSCALE_SERVICE} restarted`
+      else return resp
+    } catch (ex) {
+      if (ex instanceof ShellError) {
+        throw ex.stderr
+      }
+    }
   }
   // async updateOverrideLocalDNS(override_local_dns: boolean) {
   //
