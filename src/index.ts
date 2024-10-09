@@ -2,14 +2,19 @@ import { Hono } from 'hono'
 import { bearerAuth } from 'hono/bearer-auth'
 import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
-import { Headscale } from './headscale'
+import { Headscale } from './Headscale'
+
+if (Bun.env.HEADSCALE_TOKEN == undefined) throw 'HEADSCALE_TOKEN is not set'
+if (Bun.env.QUASASCALE_URL == undefined) throw 'QUASASCALE_URL is not set'
+if (Bun.env.HEADSCALE_API_URL == undefined) throw 'HEADSCALE_API_URL is not set'
 const proxy_url = Bun.env.HEADSCALE_API_URL
-const headscale = Headscale.Instance()
+const headscale = await Headscale.Instance()
 const app = new Hono()
+const origins = Bun.env.QUASASCALE_URL.split(',')
 app.use(
   '/*',
   cors({
-    origin: Bun.env.QUASCALE_URL,
+    origin: origins,
     allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Authorization', 'Content-Type'],
     maxAge: 86400, // Optional: Cache the preflight request for 24 hours

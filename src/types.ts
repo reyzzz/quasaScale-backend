@@ -1,9 +1,10 @@
 declare module 'bun' {
   interface Env {
     HEADSCALE_TOKEN: string
-    HEADSCALE_CONFIG_YAML: string
+    HEADSCALE_CONFIG_PATH: string
     HEADSCALE_SQLITE_PATH: string
-    QUASCALE_URL: string
+    HEADSCALE_ACL_PATH: string
+    QUASASCALE_URL: string
     HEADSCALE_API_URL: string
     HEADSCALE_SERVICE: string
     DOCKER: string
@@ -11,7 +12,7 @@ declare module 'bun' {
   }
 }
 
-export interface Config {
+export interface HeadscaleConfig {
   server_url: string
   listen_addr: string
   metrics_listen_addr: string
@@ -168,34 +169,34 @@ export interface ACLConfig {
   acls: ACL[]
 }
 
-export function isGroups(obj: any): obj is Groups {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    Object.keys(obj).every((key) => key.startsWith('group:') && key.length > 6)
-  )
-}
+// export function isGroups(obj: any): obj is Groups {
+//   return (
+//     typeof obj === 'object' &&
+//     obj !== null &&
+//     Object.keys(obj).every((key) => key.startsWith('group:') && key.length > 6)
+//   )
+// }
 
-export function isTagOwners(obj: any): obj is TagOwners {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    Object.keys(obj).every((key) => key.startsWith('tag:') && key.length > 4)
-  )
-}
+// export function isTagOwners(obj: any): obj is TagOwners {
+//   return (
+//     typeof obj === 'object' &&
+//     obj !== null &&
+//     Object.keys(obj).every((key) => key.startsWith('tag:') && key.length > 4)
+//   )
+// }
 
-export function isACL(obj: any): obj is ACL {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'action' in obj &&
-    'src' in obj &&
-    'dst' in obj &&
-    obj.src.length > 0 &&
-    obj.dst.length > 0
-  )
-}
+// export function isACL(obj: any): obj is ACL {
+//   return (
+//     typeof obj === 'object' &&
+//     obj !== null &&
+//     'action' in obj &&
+//     'src' in obj &&
+//     'dst' in obj &&
+//     obj.src.length > 0 &&
+//     obj.dst.length > 0
+//   )
+// }
 
-export function isHosts(obj: any): obj is Hosts {
-  return !isGroups(obj) && !isTagOwners(obj) && !isACL(obj)
-}
+// export function isHosts(obj: any): obj is Hosts {
+//   return !isGroups(obj) && !isTagOwners(obj) && !isACL(obj)
+// }

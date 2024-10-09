@@ -1,5 +1,6 @@
 {
   "name": "quasascale-backend",
+  "version": "0.1.0",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "prod": "NODE_ENV=production bun run ./dist/index.js",
@@ -8,10 +9,12 @@
   "dependencies": {
     "hjson": "^3.2.2",
     "hono": "^4.6.3",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "ofetch": "^1.4.1"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/dockerode": "^3.3.31",
     "@types/hjson": "^2.4.6",
     "@types/js-yaml": "^4.0.9"
   }
