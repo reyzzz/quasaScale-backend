@@ -6,6 +6,8 @@ import type {
   Groups,
   TagOwners,
   Hosts,
+  HeadscaleNode,
+  QuasascaleNode,
 } from './types'
 import { dump, load } from 'js-yaml'
 import { Database } from 'bun:sqlite'
@@ -159,6 +161,29 @@ export class Headscale {
 
   async getACLs() {
     return this.acls
+  }
+
+  async getNodes(hnodes: HeadscaleNode[]) {
+    const nodes = this.db
+      .query(
+        `SELECT nodes.id as id, given_name as name, ipv4,ipv6,
+           count(routes.node_id) as routes FROM nodes 
+          left join routes on nodes.id = routes.node_id
+          group by nodes.id;`
+      )
+      .all() as QuasascaleNode[]
+    return nodes.map((node) => {
+      const hsnode = hnodes.find((hnode) => hnode.id === node.id.toString())
+      if (hsnode)
+        return {
+          ...node,
+          online: hsnode.online,
+          user: hsnode.user,
+          forced_tags: hsnode.forcedTags,
+          last_seen: hsnode.lastSeen,
+          machine_key: hsnode.machineKey,
+        }
+    })
   }
 
   async updateACLs(data: Partial<ACLConfig>) {

@@ -8,6 +8,7 @@ if (Bun.env.HEADSCALE_TOKEN == undefined) throw 'HEADSCALE_TOKEN is not set'
 if (Bun.env.QUASASCALE_URL == undefined) throw 'QUASASCALE_URL is not set'
 if (Bun.env.HEADSCALE_API_URL == undefined) throw 'HEADSCALE_API_URL is not set'
 const proxy_url = Bun.env.HEADSCALE_API_URL
+const token = Bun.env.HEADSCALE_TOKEN
 const headscale = await Headscale.Instance()
 const app = new Hono()
 const origins = Bun.env.QUASASCALE_URL.split(',')
@@ -24,7 +25,7 @@ app.use(
 app.use(
   '/api/*',
   bearerAuth({
-    token: Bun.env.HEADSCALE_TOKEN,
+    token,
     invalidTokenMessage: 'Invalid Token',
   })
 )
@@ -132,6 +133,23 @@ app.get('/api/acls', async (c) => {
   try {
     const acls = await headscale.getACLs()
     return c.json({ acls })
+  } catch (err) {
+    return c.json({ message: err }, 500)
+  }
+})
+
+app.get('/api/nodes', async (c) => {
+  try {
+    const resp = await fetch(`${proxy_url}/node`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    const hnodes = await resp.json()
+    const nodes = await headscale.getNodes(hnodes.nodes)
+    return c.json(nodes)
   } catch (err) {
     return c.json({ message: err }, 500)
   }

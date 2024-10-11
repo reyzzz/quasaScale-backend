@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "prod": "NODE_ENV=production bun run ./dist/index.js",
-    "build": "bun build --target=bun --minify ./src/index.ts --outdir ./dist"
+    "build": "bun build --target=bun --minify ./src/index.ts --outdir ./dist",
+    "compile": "bun build --compile --target=bun-linux-x64 --sourcemap --minify ./src/index.ts --outfile quasascale-backend"
   },
   "dependencies": {
     "hjson": "^3.2.2",

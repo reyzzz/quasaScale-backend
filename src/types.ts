@@ -169,6 +169,43 @@ export interface ACLConfig {
   acls: ACL[]
 }
 
+export interface HeadscaleNode {
+  id: string
+  machineKey: string
+  nodeKey: string
+  discoKey: string
+  ipAddresses: string[]
+  name: string
+  user: User
+  lastSeen: string
+  expiry: string
+  createdAt: string
+  registerMethod: string
+  invalidTags: string[]
+  validTags: string[]
+  forcedTags: string[]
+  givenName: string
+  online: boolean
+}
+
+export interface User {
+  id: string
+  name: string
+  createdAt: string
+}
+
+export interface QuasascaleNode {
+  id: number
+  name: string
+  last_seen: string
+  ipv4: string
+  ipv6: string
+  user?: User
+  machine_key: string
+  forced_tags: string[]
+  online: boolean
+  routes: number
+}
 // export function isGroups(obj: any): obj is Groups {
 //   return (
 //     typeof obj === 'object' &&
