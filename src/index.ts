@@ -159,7 +159,8 @@ app.patch('/api/acls', async (c) => {
   try {
     const { data } = await c.req.json()
     await headscale.updateACLs(data)
-    return c.json({ message: 'ACLs updated successfully' }, 200)
+    const acls = await headscale.getACLs()
+    return c.json({ acls }, 200)
   } catch (ex) {
     return c.json({ message: ex }, 500)
   }
