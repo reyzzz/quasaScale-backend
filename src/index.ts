@@ -10,7 +10,7 @@ if (Bun.env.HEADSCALE_API_URL == undefined) throw 'HEADSCALE_API_URL is not set'
 const proxy_url = Bun.env.HEADSCALE_API_URL
 const token = Bun.env.HEADSCALE_TOKEN
 const headscale = await Headscale.Instance()
-const app = new Hono()
+const app = new Hono().basePath('/api')
 const origins = Bun.env.QUASASCALE_URL.split(',')
 app.use(
   '/*',
@@ -32,31 +32,31 @@ app.use(
 
 app.use(logger())
 
-app.patch('/api/domain/:index', async (c) => {
+app.patch('/domain/:index', async (c) => {
   const body = await c.req.json()
   const index = c.req.param('index')
   await headscale.updateDomain(body.domain, parseInt(index))
   return c.json({ message: 'Domain updated successfully' }, 200)
 })
 
-app.post('/api/domain', async (c) => {
+app.post('/domain', async (c) => {
   const body = await c.req.json()
   await headscale.addDomain(body.domain)
   return c.json({ message: 'Domain added successfully' }, 201)
 })
 
-app.delete('/api/domain/:index', async (c) => {
+app.delete('/domain/:index', async (c) => {
   const index = c.req.param('index')
   await headscale.deleteDomain(parseInt(index))
   return c.json({ message: 'Domain deleted successfully' }, 204)
 })
 
-app.get('/api/domains', async (c) => {
+app.get('/domains', async (c) => {
   const extra_records = await headscale.getDomains()
   return c.json({ domains: extra_records }, 200)
 })
 
-app.patch('/api/ip/:nodeId', async (c) => {
+app.patch('/ip/:nodeId', async (c) => {
   const nodeId = c.req.param('nodeId')
   const body = await c.req.json()
   let update = false
@@ -76,12 +76,12 @@ app.patch('/api/ip/:nodeId', async (c) => {
     )
 })
 
-app.get('/api/version', async (c) => {
+app.get('/version', async (c) => {
   const resp = await headscale.version()
   return c.json(resp, 200)
 })
 
-app.post('/api/restart', async (c) => {
+app.post('/restart', async (c) => {
   try {
     const message = await headscale.restart()
     return c.json({ message }, 200)
@@ -90,25 +90,25 @@ app.post('/api/restart', async (c) => {
   }
 })
 
-app.patch('/api/nameservers', async (c) => {
+app.patch('/nameservers', async (c) => {
   const { servers } = await c.req.json()
   await headscale.updateNameServers(servers)
   return c.json({ message: 'Nameservers updated successfully' }, 200)
 })
 
-app.patch('/api/search-domains', async (c) => {
+app.patch('/search-domains', async (c) => {
   const { domains } = await c.req.json()
   await headscale.updateSearchDomains(domains)
   return c.json({ message: 'Search domains updated successfully' }, 200)
 })
 
-app.patch('/api/tailnet-name', async (c) => {
+app.patch('/tailnet-name', async (c) => {
   const { name } = await c.req.json()
   await headscale.updateTailnetName(name)
   return c.json({ message: 'Tailnet name updated successfully' }, 200)
 })
 
-app.patch('/api/magic-dns', async (c) => {
+app.patch('/magic-dns', async (c) => {
   const { magic_dns } = await c.req.json()
   await headscale.updateMagicDNS(magic_dns)
   return c.json({ message: 'Magic DNS updated successfully' }, 200)
@@ -120,7 +120,7 @@ app.patch('/api/magic-dns', async (c) => {
 //   return c.json({ message: 'Override local DNS updated successfully' }, 200)
 // })
 
-app.get('/api/dns-settings', async (c) => {
+app.get('/dns-settings', async (c) => {
   try {
     const dns_settings = await headscale.getDNSSettings()
     return c.json({ dns_settings: dns_settings })
@@ -129,7 +129,7 @@ app.get('/api/dns-settings', async (c) => {
   }
 })
 
-app.get('/api/acls', async (c) => {
+app.get('/acls', async (c) => {
   try {
     const acls = await headscale.getACLs()
     return c.json({ acls })
@@ -138,7 +138,7 @@ app.get('/api/acls', async (c) => {
   }
 })
 
-app.get('/api/nodes', async (c) => {
+app.get('/nodes', async (c) => {
   try {
     const resp = await fetch(`${proxy_url}/node`, {
       method: 'GET',
@@ -155,7 +155,7 @@ app.get('/api/nodes', async (c) => {
   }
 })
 
-app.patch('/api/acls', async (c) => {
+app.patch('/acls', async (c) => {
   try {
     const { data } = await c.req.json()
     await headscale.updateACLs(data)
@@ -166,20 +166,34 @@ app.patch('/api/acls', async (c) => {
   }
 })
 
-app.all('/api/*', async (c) => {
-  let path = c.req.path
-  path = path.replace(new RegExp(`^${c.req.routePath.replace('*', '')}`), '/')
-  let url = proxy_url ? proxy_url + path : c.req.url
-  // add params to URL
-  if (c.req.query()) url = url + '?' + new URLSearchParams(c.req.query())
-  // request
-  const rep = await fetch(url, {
-    method: c.req.method,
-    headers: c.req.raw.headers,
-    body: c.req.raw.body,
-  })
-  if (rep.status === 101) return rep
-  return new Response(rep.body, rep)
+app.all('/*', async (c) => {
+  try {
+    let path = c.req.path
+    path = path.replace(new RegExp(`^${c.req.routePath.replace('*', '')}`), '/')
+    let url = proxy_url ? proxy_url + path : c.req.url
+    // add params to URL
+    if (Object.keys(c.req.query()).length > 0)
+      url = url + '?' + new URLSearchParams(c.req.query())
+    let bodyJson = undefined
+    try {
+      bodyJson = await c.req.json()
+    } catch {}
+    console.log(url, c.req.method, bodyJson)
+    let fetchInit: RequestInit = {
+      method: c.req.method,
+      headers: c.req.raw.headers,
+    }
+    if (bodyJson !== undefined) {
+      fetchInit.body = JSON.stringify(bodyJson)
+    }
+    // request
+    const rep = await fetch(url, fetchInit)
+    if (rep.status === 101) return rep
+    return new Response(rep.body, rep)
+  } catch (ex) {
+    console.log(ex)
+    return c.json({ message: 'unknown error' }, 500)
+  }
 })
 
 export default app
