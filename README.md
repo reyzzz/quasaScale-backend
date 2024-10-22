@@ -18,10 +18,13 @@ To run the QuasaScale Backend, you'll need:
 
 ### Installation
 
-1. Use this one liner to download quasascale-backend release
+1. Download and unzip quasascale-backend
 
    ```bash
-   curl -fsSl github.com | sh
+   mkdir quasascale-backend
+   wget https://github.com/reyzzz/quasaScale-backend/releases/download/v0.23.0-beta.1/quasascale-backend.zip
+   unzip quasascale-backend.zip
+   rm quasascale-backend.zip
    ```
 
 1. Adjust .env file
@@ -40,7 +43,7 @@ To run the QuasaScale Backend, you'll need:
    - CONTAINER_NAME the name of headscale docker container
 
 1. Run in production as system service
-   - Use the provided quasascale-backend.service and edit the WorkingDirectory and the ExecStart, then
+   - Use the provided quasascale-backend.service and edit the WorkingDirectory, then
    
    ```bash
    cp ./quasascale-backend.service /lib/systemd/system/quasascale-backend.service
