@@ -178,7 +178,7 @@ app.all('/*', async (c) => {
     try {
       bodyJson = await c.req.json()
     } catch {}
-    console.log(url, c.req.method, bodyJson)
+
     let fetchInit: RequestInit = {
       method: c.req.method,
       headers: c.req.raw.headers,
@@ -196,4 +196,7 @@ app.all('/*', async (c) => {
   }
 })
 
-export default app
+export default {
+  port: Bun.env.PORT ?? 3000,
+  fetch: app.fetch,
+}

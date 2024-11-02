@@ -1,5 +1,6 @@
 import type { IEngine } from './IEngine'
 import type { ContainerInfo } from 'dockerode'
+import { $, ShellError } from 'bun'
 import { FetchError, ofetch, type $Fetch } from 'ofetch'
 export class DockerEngine implements IEngine {
   private container_id: string | null = null
@@ -63,5 +64,9 @@ export class DockerEngine implements IEngine {
     )
     if (data.length) this.container_id = data[0].Id
     return this.container_id
+  }
+
+  async version(): Promise<Record<'version', string>> {
+    return await $`docker exec ${this.container_name} headscale -o json version`.json()
   }
 }

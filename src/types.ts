@@ -9,6 +9,7 @@ declare module 'bun' {
     HEADSCALE_SERVICE: string
     DOCKER: string
     CONTAINER_NAME: string
+    PORT: string
   }
 }
 

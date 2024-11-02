@@ -131,7 +131,7 @@ export class Headscale {
   }
 
   async version(): Promise<Record<'version', string>> {
-    return await $`headscale -o json version`.json()
+    return await this.engine.version()
   }
 
   async getDNSSettings(): Promise<DNSSettings> {

@@ -41,6 +41,7 @@ To run the QuasaScale Backend, you'll need:
    - DOCKER if headscale is running in docker
    - HEADSCALE_SERVICE the name of the systemd service
    - CONTAINER_NAME the name of headscale docker container
+   - PORT the port number of quasaScale backend service, default to 3000
 
 1. Run in production as system service
    - Use the provided quasascale-backend.service and edit the WorkingDirectory, then

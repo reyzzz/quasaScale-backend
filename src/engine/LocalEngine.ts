@@ -26,4 +26,8 @@ export class LocalEngine implements IEngine {
       throw 'unknown error'
     }
   }
+
+  async version(): Promise<Record<'version', string>> {
+    return await $`headscale -o json version`.json()
+  }
 }
