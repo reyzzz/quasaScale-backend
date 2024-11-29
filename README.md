@@ -14,8 +14,7 @@ Actually it is meant to be used with its frontend [QuasaScale ](https://github.c
 To run the QuasaScale Backend, you'll need:
 
 - **Bun**: You can install Bun by following the official guide at [bun.sh](https://bun.sh/).
-- **Headscale**: You must have a working Headscale setup with version 0.23.0 (it is not compatible with older versions), as QuasaScale Backend extends its API. **(headscale docker installation not tested yet)**
-
+- **Headscale**: You must have a working Headscale setup with version 0.23.0 (it is not compatible with older versions), as QuasaScale Backend extends its API.
 ### Installation
 
 1. Download and unzip quasascale-backend
