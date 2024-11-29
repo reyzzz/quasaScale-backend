@@ -64,7 +64,7 @@ export class Headscale {
       Bun.env.HEADSCALE_CONFIG_PATH == undefined ||
       Bun.env.HEADSCALE_CONFIG_PATH == ''
     )
-      throw new Error('HEADSCALE_CONFIG_YAML is not set')
+      throw new Error('HEADSCALE_CONFIG_PATH is not set')
     const fileContent = await Bun.file(Bun.env.HEADSCALE_CONFIG_PATH).text()
     const config = load(fileContent) as HeadscaleConfig
     return config
@@ -75,7 +75,7 @@ export class Headscale {
       Bun.env.HEADSCALE_ACL_PATH == undefined ||
       Bun.env.HEADSCALE_ACL_PATH == ''
     )
-      throw new Error('HEADSCALE_CONFIG_YAML is not set')
+      throw new Error('HEADSCALE_ACL_PATH is not set')
     const acls_text = await Bun.file(Bun.env.HEADSCALE_ACL_PATH).text()
     const acls = parse(acls_text, { keepWsc: true }) as ACLConfig
     return acls
