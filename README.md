@@ -35,10 +35,10 @@ To run the QuasaScale Backend, you'll need:
    - HEADSCALE_CONFIG_PATH is the path of headscale config.yaml file
    - HEADSCALE_SQLITE_PATH is the path of headscale db.sqlite database file
    - HEADSCALE_ACL_PATH is the path of headscale acl.hujson file
-   - QUASASCALE_URL is a comma separated quasascale (frontend) urls of the origin that should be allowed by CORS
    - HEADSCALE_API_URL the localhost url of headscale
-   - DOCKER if headscale is running in docker
    - HEADSCALE_SERVICE the name of the systemd service
+   - QUASASCALE_URL is a comma separated quasascale (frontend) urls of the origin that should be allowed by CORS
+   - DOCKER if headscale is running in docker
    - CONTAINER_NAME the name of headscale docker container
    - PORT the port number of quasaScale backend service, default to 3000
 
