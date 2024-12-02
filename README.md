@@ -27,7 +27,7 @@ To run the QuasaScale Backend, you'll need:
    ```
 
 1. Adjust .env file
-   - HEADSCALE_TOKEN is the token that you will generate using headscale
+   - HEADSCALE_API_KEY is the api key that you generate using headscale
 
       ```bash
       headscale apikeys create -e 999d
