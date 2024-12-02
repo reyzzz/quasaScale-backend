@@ -21,6 +21,7 @@ To run the QuasaScale Backend, you'll need:
 
    ```bash
    mkdir quasascale-backend
+   cd quasascale-backend
    wget https://github.com/reyzzz/quasaScale-backend/releases/download/v0.23.0-beta.2/quasascale-backend.zip
    unzip quasascale-backend.zip
    rm quasascale-backend.zip
@@ -44,7 +45,7 @@ To run the QuasaScale Backend, you'll need:
 
 1. Run in production as system service
    - Use the provided quasascale-backend.service and edit the WorkingDirectory, then
-   
+
    ```bash
    cp ./quasascale-backend.service /lib/systemd/system/quasascale-backend.service
    systemctl enable quasascale-backend
