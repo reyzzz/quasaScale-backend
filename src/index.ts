@@ -4,11 +4,11 @@ import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
 import { Headscale } from './Headscale'
 
-if (Bun.env.HEADSCALE_TOKEN == undefined) throw 'HEADSCALE_TOKEN is not set'
+if (Bun.env.HEADSCALE_API_KEY == undefined) throw 'HEADSCALE_API_KEY is not set'
 if (Bun.env.QUASASCALE_URL == undefined) throw 'QUASASCALE_URL is not set'
 if (Bun.env.HEADSCALE_API_URL == undefined) throw 'HEADSCALE_API_URL is not set'
 const proxy_url = Bun.env.HEADSCALE_API_URL
-const token = Bun.env.HEADSCALE_TOKEN
+const token = Bun.env.HEADSCALE_API_KEY
 const headscale = await Headscale.Instance()
 const app = new Hono().basePath('/api')
 const origins = Bun.env.QUASASCALE_URL.split(',')

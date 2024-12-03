@@ -21,13 +21,14 @@ To run the QuasaScale Backend, you'll need:
 
    ```bash
    mkdir quasascale-backend
+   cd quasascale-backend
    wget https://github.com/reyzzz/quasaScale-backend/releases/download/v0.23.0-beta.2/quasascale-backend.zip
    unzip quasascale-backend.zip
    rm quasascale-backend.zip
    ```
 
 1. Adjust .env file
-   - HEADSCALE_TOKEN is the token that you will generate using headscale
+   - HEADSCALE_API_KEY is the api key that you generate using headscale
 
       ```bash
       headscale apikeys create -e 999d
@@ -35,16 +36,16 @@ To run the QuasaScale Backend, you'll need:
    - HEADSCALE_CONFIG_PATH is the path of headscale config.yaml file
    - HEADSCALE_SQLITE_PATH is the path of headscale db.sqlite database file
    - HEADSCALE_ACL_PATH is the path of headscale acl.hujson file
-   - QUASASCALE_URL is a comma separated quasascale (frontend) urls of the origin that should be allowed by CORS
    - HEADSCALE_API_URL the localhost url of headscale
-   - DOCKER if headscale is running in docker
    - HEADSCALE_SERVICE the name of the systemd service
+   - QUASASCALE_URL is a comma separated quasascale (frontend) urls of the origin that should be allowed by CORS
+   - DOCKER if headscale is running in docker
    - CONTAINER_NAME the name of headscale docker container
    - PORT the port number of quasaScale backend service, default to 3000
 
 1. Run in production as system service
    - Use the provided quasascale-backend.service and edit the WorkingDirectory, then
-   
+
    ```bash
    cp ./quasascale-backend.service /lib/systemd/system/quasascale-backend.service
    systemctl enable quasascale-backend

@@ -1,6 +1,6 @@
 declare module 'bun' {
   interface Env {
-    HEADSCALE_TOKEN: string
+    HEADSCALE_API_KEY: string
     HEADSCALE_CONFIG_PATH: string
     HEADSCALE_SQLITE_PATH: string
     HEADSCALE_ACL_PATH: string
