@@ -22,7 +22,7 @@ To run the QuasaScale Backend, you'll need:
    ```bash
    mkdir quasascale-backend
    cd quasascale-backend
-   wget https://github.com/reyzzz/quasaScale-backend/releases/download/latest/quasascale-backend.zip
+   wget https://github.com/reyzzz/quasaScale-backend/releases/latest/download/quasascale-backend.zip
    unzip quasascale-backend.zip
    rm quasascale-backend.zip
    ```
