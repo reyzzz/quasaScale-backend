@@ -37,11 +37,10 @@ To run the QuasaScale Backend, you'll need:
    - HEADSCALE_SQLITE_PATH is the path of headscale db.sqlite database file
    - HEADSCALE_ACL_PATH is the path of headscale acl.hujson file
    - HEADSCALE_API_URL the localhost url of headscale
-   - HEADSCALE_SERVICE the name of the systemd service
-   - QUASASCALE_URL is a comma separated quasascale (frontend) urls of the origin that should be allowed by CORS
-   - DOCKER if headscale is running in docker
-   - CONTAINER_NAME the name of headscale docker container
-   - PORT the port number of quasaScale backend service, default to 3000
+   - HEADSCALE_INTEGRATION docker or systemd depending if headscale is running in docker or as a system service
+   - HEADSCALE_NAME is the name of the headscale systemd service or the headscale docker container
+   - QUASASCALE_PORT the port number of quasaScale backend service, default 3000
+   - QUASASCALE_FRONTEND_URLS is a comma separated quasaScale (frontend) urls of the origin that should be allowed by CORS
 
 1. Run in production as system service
    - Use the provided quasascale-backend.service and edit the WorkingDirectory, then
@@ -51,3 +50,11 @@ To run the QuasaScale Backend, you'll need:
    systemctl enable quasascale-backend
    systemctl start quasascale-backend
    ```
+2. Integrations that are supported:
+   | Headscale | QuasaScale Backend | Supported |
+   | :-------: | :----:| :------: |
+   | docker | docker | ✅ |
+   | docker | systemd | ✅ |
+   | systemd | systemd | ✅ |
+   | systemd | docker | ❌ |
+

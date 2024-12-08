@@ -4,12 +4,11 @@ declare module 'bun' {
     HEADSCALE_CONFIG_PATH: string
     HEADSCALE_SQLITE_PATH: string
     HEADSCALE_ACL_PATH: string
-    QUASASCALE_URL: string
     HEADSCALE_API_URL: string
-    HEADSCALE_SERVICE: string
-    DOCKER: string
-    CONTAINER_NAME: string
-    PORT: string
+    HEADSCALE_INTEGRATION: string
+    HEADSCALE_NAME: string
+    QUASASCALE_FRONTEND_URLS: string
+    QUASASCALE_PORT: string
   }
 }
 
@@ -137,28 +136,28 @@ export interface Hosts {
 
 export interface Host {
   [
-    key:
-      | WithPrefix<'group'>
-      | WithPrefix<'tag'>
-      | WithPrefix<'autogroup:'>
-      | string
+  key:
+    | WithPrefix<'group'>
+    | WithPrefix<'tag'>
+    | WithPrefix<'autogroup:'>
+    | string
   ]: string
 }
 export interface ACL {
   action: 'accept'
   proto:
-    | 'igmp'
-    | 'ipv4'
-    | 'ip-in-ip'
-    | 'tcp'
-    | 'egp'
-    | 'igp'
-    | 'udp'
-    | 'gre'
-    | 'esp'
-    | 'ah'
-    | 'sctp'
-    | (string & {})
+  | 'igmp'
+  | 'ipv4'
+  | 'ip-in-ip'
+  | 'tcp'
+  | 'egp'
+  | 'igp'
+  | 'udp'
+  | 'gre'
+  | 'esp'
+  | 'ah'
+  | 'sctp'
+  | (string & {})
   src: Host[]
   dst: Host[]
 }

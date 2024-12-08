@@ -1,6 +1,5 @@
 import type { IEngine } from './IEngine'
 import type { ContainerInfo } from 'dockerode'
-import { $, ShellError } from 'bun'
 import { FetchError, ofetch, type $Fetch } from 'ofetch'
 export class DockerEngine implements IEngine {
   private container_id: string | null = null
@@ -67,6 +66,33 @@ export class DockerEngine implements IEngine {
   }
 
   async version(): Promise<Record<'version', string>> {
-    return await $`docker exec ${this.container_name} headscale -o json version`.json()
+    const execId = await this.createExecInstance()
+    const version = await this.startExecInstance(execId)
+    return version
+  }
+
+  async createExecInstance() {
+    const execId = await this.docker(`/containers/${this.container_name}/exec`, {
+      method: 'POST',
+      body: JSON.stringify(
+        {
+          "AttachStdout": true,
+          "Tty": true,
+          "Cmd": ["headscale", "-o", "json", "version"]
+        }
+      )
+    })
+    return execId.Id
+  }
+
+  async startExecInstance(execId: string) {
+    const resp = await this.docker(`/exec/${execId}/start`, {
+      method: 'POST',
+      body: JSON.stringify({
+        "Detach": false,
+        "Tty": true,
+      })
+    })
+    return JSON.parse(await resp.text())
   }
 }

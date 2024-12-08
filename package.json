@@ -1,6 +1,6 @@
 {
   "name": "quasascale-backend",
-  "version": "0.23.0-beta.2",
+  "version": "0.23.0-beta.3",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "prod": "NODE_ENV=production bun run ./dist/index.js",

@@ -11,7 +11,6 @@ import type {
 } from './types'
 import { dump, load } from 'js-yaml'
 import { Database } from 'bun:sqlite'
-import { $ } from 'bun'
 import { parse, stringify } from 'hjson'
 import type { IEngine } from './engine/IEngine'
 import { LocalEngine } from './engine/LocalEngine'
@@ -28,23 +27,12 @@ export class Headscale {
    *
    */
   constructor(config: HeadscaleConfig, acls: ACLConfig) {
-    if (Bun.env.DOCKER === undefined) throw new Error('DOCKER is not set')
+    if (Bun.env.HEADSCALE_NAME === undefined) throw new Error('HEADSCALE_NAME is not set')
     if (Bun.env.HEADSCALE_SQLITE_PATH === undefined)
       throw new Error('HEADSCALE_SQLITE_PATH is not set')
     if (Bun.env.HEADSCALE_ACL_PATH === undefined)
       throw new Error('HEADSCALE_ACL_PATH is not set')
-    if (Bun.env.DOCKER === 'false') {
-      if (
-        Bun.env.HEADSCALE_SERVICE == undefined ||
-        Bun.env.HEADSCALE_SERVICE == ''
-      )
-        throw new Error('HEADSCALE_SERVICE is not set')
-      this.engine = new LocalEngine(Bun.env.HEADSCALE_SERVICE)
-    } else {
-      if (Bun.env.CONTAINER_NAME == undefined || Bun.env.CONTAINER_NAME == '')
-        throw new Error('CONTAINER_NAME is not set')
-      this.engine = new DockerEngine(Bun.env.CONTAINER_NAME)
-    }
+    this.engine = Bun.env.HEADSCALE_INTEGRATION === 'docker' ? new DockerEngine(Bun.env.HEADSCALE_NAME) : new LocalEngine(Bun.env.HEADSCALE_NAME)
     this.headscale_config_path = Bun.env.HEADSCALE_CONFIG_PATH
     this.config = config
     this.acls = acls
