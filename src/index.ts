@@ -178,7 +178,7 @@ app.all('/*', async (c) => {
     try {
       bodyJson = await c.req.json()
     } catch { }
-
+    c.req.raw.headers.delete('host')
     let fetchInit: RequestInit = {
       method: c.req.method,
       headers: c.req.raw.headers,
