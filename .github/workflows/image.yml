@@ -32,6 +32,7 @@ jobs:
         uses: docker/build-push-action@master
         with:
           context: .
+          pull: true
           push: true
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/quasascale-backend:cache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/quasascale-backend:cache,mode=max
