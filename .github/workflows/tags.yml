@@ -63,4 +63,4 @@ jobs:
           push: true
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/quasascale-backend:cache-${{ matrix.tag }}
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/quasascale-backend:cache-${{ matrix.tag }},mode=max
-          tags: ${{ fromJson(env.tags) }}
+          tags: ${{ join(fromJSON(env.tags), ', ') }}
