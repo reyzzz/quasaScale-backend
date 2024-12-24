@@ -40,7 +40,8 @@ jobs:
           latest="$(git describe --tags --abbrev=0)"
           [ "$vtag" = "$latest" ] && tags="$tags latest"
           repo="${{ secrets.DOCKERHUB_USERNAME }}/quasascale-backend:"
-          echo "tags=$(echo "$tags" | jq -cR 'split(" ") | map("'"$repo"'" + .)')" >> $GITHUB_ENV
+          repo_tags=$(echo "$tags" | jq -cR --arg repo "$repo" 'split(" ") | map($repo + .)')
+          echo "tags=$repo_tags" >> $GITHUB_ENV
 
       - name: Log in to Docker Hub
         uses: docker/login-action@master
