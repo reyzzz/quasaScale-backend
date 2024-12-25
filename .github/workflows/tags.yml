@@ -18,6 +18,7 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
+
       - name: Setup variables
         id: tags
         run: echo "tags=$(git tag -l | jq -R . | jq -cs .)" >> $GITHUB_ENV
@@ -32,6 +33,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Get tags
         run: |
