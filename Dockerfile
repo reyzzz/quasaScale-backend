@@ -15,6 +15,5 @@ FROM base AS release
 
 ENV NODE_ENV=production
 COPY --from=prerelease /usr/src/app/dist/index.js .
-USER bun
 EXPOSE 3000/tcp
 ENTRYPOINT [ "bun", "run", "index.js" ]
