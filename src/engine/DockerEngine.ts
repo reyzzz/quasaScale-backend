@@ -59,7 +59,7 @@ export class DockerEngine implements IEngine {
   private async getContainerId(container_name: string) {
     if (this.container_id) return this.container_id
     const data = await this.docker<ContainerInfo[]>(
-      `/containers/json?filters={"name":["${container_name}"]}`
+      `/containers/json?filters={"name":["^${container_name}$"]}`
     )
     if (data.length) this.container_id = data[0].Id
     return this.container_id
