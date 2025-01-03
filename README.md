@@ -15,6 +15,7 @@ To run the QuasaScale Backend, you'll need:
 
 - **Bun**: You can install Bun by following the official guide at [bun.sh](https://bun.sh/).
 - **Headscale**: You must have a working Headscale setup with version 0.23.0 (it is not compatible with older versions), as QuasaScale Backend extends its API.
+
 ### Installation
 
 1. Download and unzip quasascale-backend
@@ -28,21 +29,21 @@ To run the QuasaScale Backend, you'll need:
    ```
 
 1. Adjust .env file
-   - HEADSCALE_API_KEY is the api key that you generate using headscale
-
-      ```bash
-      headscale apikeys create -e 999d
-      ```
-   - HEADSCALE_CONFIG_PATH is the path of headscale config.yaml file
-   - HEADSCALE_SQLITE_PATH is the path of headscale db.sqlite database file
-   - HEADSCALE_ACL_PATH is the path of headscale acl.hujson file
-   - HEADSCALE_API_URL the localhost url of headscale
-   - HEADSCALE_INTEGRATION docker or systemd depending if headscale is running in docker or as a system service
-   - HEADSCALE_NAME is the name of the headscale systemd service or the headscale docker container
-   - QUASASCALE_PORT the port number of quasaScale backend service, default 3000
-   - QUASASCALE_FRONTEND_URLS is a comma separated quasaScale (frontend) urls of the origin that should be allowed by CORS
+   |Env Variable|Explanation|Default Value|
+   |----------|----|:--:|
+   |HEADSCALE_API_KEY| the api key that you generate using headscale cli `headscale apikeys create -e 90d`| - |
+   |HEADSCALE_CONFIG_PATH| the path of headscale `config.yaml` file| - |
+   |HEADSCALE_SQLITE_PATH| the path of headscale `db.sqlite` database file| - |
+   |HEADSCALE_ACL_PATH| the path of headscale `acl.hujson` file| - |
+   |HEADSCALE_API_URL| the localhost url of headscale| - |
+   |HEADSCALE_INTEGRATION| `docker` or `systemd` depending if headscale is running in docker or as a system service| - |
+   |HEADSCALE_NAME| the name of the headscale systemd service or the headscale docker container| - |
+   |HEADSCALE_API_KEY_AUTO_RENEW| Auto renew the generated headscale api key after expiration| true |
+   |QUASASCALE_PORT| the port number of quasaScale backend service| 3000 |
+   |QUASASCALE_FRONTEND_URLS| a comma separated quasaScale (frontend) urls of the origin that should be allowed by CORS| - |
 
 1. Run in production as system service
+
    - Use the provided quasascale-backend.service and edit the WorkingDirectory, then
 
    ```bash
@@ -50,11 +51,11 @@ To run the QuasaScale Backend, you'll need:
    systemctl enable quasascale-backend
    systemctl start quasascale-backend
    ```
-2. Integrations that are supported:
+
+1. Integrations that are supported:
    | Headscale | QuasaScale Backend | Supported |
    | :-------: | :----:| :------: |
    | docker | docker | ✅ |
    | docker | systemd | ✅ |
    | systemd | systemd | ✅ |
    | systemd | docker | ❌ |
-

@@ -5,10 +5,15 @@ import { cors } from 'hono/cors'
 import { Headscale } from './Headscale'
 
 if (Bun.env.HEADSCALE_API_KEY == undefined) throw 'HEADSCALE_API_KEY is not set'
-if (Bun.env.QUASASCALE_FRONTEND_URLS == undefined) throw 'QUASASCALE_FRONTEND_URLS is not set'
+if (Bun.env.QUASASCALE_FRONTEND_URLS == undefined)
+  throw 'QUASASCALE_FRONTEND_URLS is not set'
 if (Bun.env.HEADSCALE_API_URL == undefined) throw 'HEADSCALE_API_URL is not set'
 const proxy_url = Bun.env.HEADSCALE_API_URL
 const token = Bun.env.HEADSCALE_API_KEY
+const headscale_api_key_auto_renew =
+  Bun.env.HEADSCALE_API_KEY_AUTO_RENEW == undefined
+    ? true
+    : JSON.parse(Bun.env.HEADSCALE_API_KEY_AUTO_RENEW)
 const headscale = await Headscale.Instance()
 const app = new Hono().basePath('/api')
 const origins = Bun.env.QUASASCALE_FRONTEND_URLS.split(',')
@@ -147,6 +152,18 @@ app.get('/nodes', async (c) => {
         'Content-Type': 'application/json',
       },
     })
+    if (resp.status === 401) {
+      if (headscale_api_key_auto_renew) {
+        await headscale.renewApiKey(token)
+      }
+      return c.json(
+        {
+          message:
+            'Headscale API Key expired, if you left default settings it should be renewed. Refresh the page',
+        },
+        401
+      )
+    }
     const hnodes = await resp.json()
     const nodes = await headscale.getNodes(hnodes.nodes)
     return c.json(nodes)
@@ -177,7 +194,7 @@ app.all('/*', async (c) => {
     let bodyJson = undefined
     try {
       bodyJson = await c.req.json()
-    } catch { }
+    } catch {}
     c.req.raw.headers.delete('host')
     let fetchInit: RequestInit = {
       method: c.req.method,

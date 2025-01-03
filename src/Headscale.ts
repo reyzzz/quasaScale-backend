@@ -27,12 +27,16 @@ export class Headscale {
    *
    */
   constructor(config: HeadscaleConfig, acls: ACLConfig) {
-    if (Bun.env.HEADSCALE_NAME === undefined) throw new Error('HEADSCALE_NAME is not set')
+    if (Bun.env.HEADSCALE_NAME === undefined)
+      throw new Error('HEADSCALE_NAME is not set')
     if (Bun.env.HEADSCALE_SQLITE_PATH === undefined)
       throw new Error('HEADSCALE_SQLITE_PATH is not set')
     if (Bun.env.HEADSCALE_ACL_PATH === undefined)
       throw new Error('HEADSCALE_ACL_PATH is not set')
-    this.engine = Bun.env.HEADSCALE_INTEGRATION === 'docker' ? new DockerEngine(Bun.env.HEADSCALE_NAME) : new LocalEngine(Bun.env.HEADSCALE_NAME)
+    this.engine =
+      Bun.env.HEADSCALE_INTEGRATION === 'docker'
+        ? new DockerEngine(Bun.env.HEADSCALE_NAME)
+        : new LocalEngine(Bun.env.HEADSCALE_NAME)
     this.headscale_config_path = Bun.env.HEADSCALE_CONFIG_PATH
     this.config = config
     this.acls = acls
@@ -196,9 +200,23 @@ export class Headscale {
     await Bun.write(this.headscale_config_path, dump(this.config))
     return await this.engine.restart()
   }
-  // async updateOverrideLocalDNS(override_local_dns: boolean) {
-  //
-  //   data.dns.override_local_dns = override_local_dns
-  //   await Bun.write(path, dump(data))
-  // }
+
+  async renewApiKey(headscale_api_key: string) {
+    const key_prefix = headscale_api_key.split('.')[0]
+    const key = this.db
+      .prepare<{ id: number }, { prefix: string }>(
+        'select * from api_keys where prefix = $prefix;'
+      )
+      .get({ prefix: key_prefix })
+    if (key) {
+      const expiry = new Date()
+      expiry.setDate(expiry.getDate() + 90)
+      this.db
+        .query('UPDATE api_keys SET expiration = $exp where id = $id;')
+        .run({
+          exp: expiry.toISOString(),
+          id: key.id,
+        })
+    }
+  }
 }
